@@ -144,7 +144,7 @@ def main(config):
         model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
         model = DistributedDataParallel(model, device_ids=[config.local_rank], output_device=config.local_rank, find_unused_parameters=config.use_nature_img_loss)
 
-    param_groups = optim_factory.add_weight_decay(model, config.weight_decay)
+    param_groups = optim_factory.param_groups_weight_decay(model, config.weight_decay)
     optimizer = torch.optim.AdamW(param_groups, lr=config.lr, betas=(0.9, 0.95))
     print(optimizer)
     loss_scaler = NativeScaler()
