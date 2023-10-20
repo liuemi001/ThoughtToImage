@@ -111,8 +111,9 @@ class eeg_pretrain_dataset(Dataset):
         super(eeg_pretrain_dataset, self).__init__()
         data = []
         images = []
-        self.input_paths = [str(f) for f in sorted(Path(path).rglob('*')) if is_npy_ext(f) and os.path.isfile(f)]
+        #self.input_paths = [str(f) for f in sorted(Path(path).rglob('*')) if is_npy_ext(f) and os.path.isfile(f)]
 
+        self.input_paths = [path]
         assert len(self.input_paths) != 0, 'No data found'
         self.data_len  = 512
         self.data_chan = 128
