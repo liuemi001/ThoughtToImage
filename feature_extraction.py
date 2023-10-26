@@ -97,7 +97,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, model):
 
 def main():
     # Load data
-    data = torch.load(eeg_14_70_path)
+    data = torch.load(eeg_55_95_path)
     print(data.keys())
     print(data['dataset'][0])
     print(data['labels'][0])
@@ -105,9 +105,9 @@ def main():
     
     # Construct dataset
     X, y = construct_dataset(data)
-    print(construct_dataset(data))
-    pprint(X)
-    pprint(y)
+    # print(construct_dataset(data))
+    # pprint(X)
+    # pprint(y)
     
     # Split data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
