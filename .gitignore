@@ -1,0 +1,5 @@
+/DreamDiffusion-main/datasets
+/DreamDiffusion-main/pretrains/models/v1-5-pruned.ckpt
+/DreamDiffusion-main/pretrains/eeg_pretrain/checkpoint.pth
+/DreamDiffusion-main/code/__pycache__
+/DreamDiffusion-main/code/sc_mbm/__pycache__
