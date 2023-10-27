@@ -4,7 +4,7 @@ import pandas as pd
 import pprint
 
 from sklearn import tree
-from sklearn.decomposition import FastICA
+from sklearn import ensemble
 from sklearn.metrics import accuracy_score
 
 
@@ -20,10 +20,10 @@ block_splits_by_image_path = base_path + "block_splits_by_image_single.pth"
 
 
 features = np.loadtxt("ica_eeg_14_70_data.csv", delimiter=",", dtype=float)
-eeg_5_95_data = torch.load(eeg_5_95_path)
-labels = np.array([eeg_5_95_data['labels']])
-features.reshape(labels.size, features.size/labels.size)
-
+eeg_14_70_data = torch.load(eeg_14_70_path)
+labels = [data['label'] for data in eeg_14_70_data['dataset']]
+labels = np.array(labels)
+features = np.reshape(features, [labels.size, int(features.size/labels.size)])
 
 
 # train validation test split
@@ -31,6 +31,7 @@ block_splits_by_image_all_data = torch.load(block_splits_by_image_all_path)
 train_indices = block_splits_by_image_all_data['splits'][0]['train']
 val_indices = block_splits_by_image_all_data['splits'][0]['val']
 test_indices = block_splits_by_image_all_data['splits'][0]['test']
+
 
 x_train = features[train_indices]
 y_train = labels[train_indices]
@@ -40,15 +41,19 @@ x_test = features[test_indices]
 y_test = features[test_indices]
 
 # train on a couple different depths of decision trees
-model = tree.DecisionTreeClassifier()
+#model = tree.DecisionTreeClassifier()
+model = ensemble.RandomForestClassifier()
+print("Training...")
 model.fit(x_train, y_train)
 
 # plot results
 
 # test on validation set
+print("predicting...")
 y_val_pred = model.predict(x_val)
 y_test_pred = model.predict(x_test)
 
+print("Calculating accuracy...")
 accuracy_val = accuracy_score(y_val.cpu().numpy(), y_val_pred)
 accuracy_test = accuracy_score(y_test.cpu().numpy(), y_test_pred)
 print("accuracy val: ", accuracy_val)
