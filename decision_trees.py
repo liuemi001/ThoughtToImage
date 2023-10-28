@@ -47,24 +47,28 @@ y_test = features[test_indices]
 model = LogisticRegression(multi_class='ovr', solver='lbfgs')
 
 print("Training...")
-model.fit(x_train, y_train)
+#model.fit(x_train, y_train)
 
 # plot results
 
 # test on validation set
 print("predicting...")
 y_val_pred = model.predict(x_val)
-np.savetxt("logreg_val_predictions.csv", y_val_pred, delimiter=",")
+np.savetxt("decision_tree_val_predictions.csv", y_val_pred, delimiter=",")
 y_test_pred = model.predict(x_test)
-np.savetxt("logreg_test_predictions.csv", y_test_pred, delimiter=",")
+np.savetxt("decision_tree_test_predictions.csv", y_test_pred, delimiter=",")
+y_train_pred = model.predict(x_train)
+np.savetxt("decision_tree_train_predictions.csv", y_test_pred, delimiter=",")
+
 
 print("Calculating accuracy...")
 print(labels)
-y_val_pred = np.loadtxt("logreg_val_predictions.csv", delimiter=",", dtype=float).astype(int)
-y_test_pred = np.loadtxt("logreg_test_predictions.csv", delimiter=",", dtype=float).astype(int)
+y_val_pred = np.loadtxt("decision_tree_val_predictions.csv", delimiter=",", dtype=float).astype(int)
+y_test_pred = np.loadtxt("decision_tree_test_predictions.csv", delimiter=",", dtype=float).astype(int)
 val_correct = np.intersect1d(y_val, y_val_pred)
 test_correct = np.intersect1d(y_test, y_test_pred)
-
+train_correct = np.intersect1d(y_train, y_train_pred)
+print("training accuracy: ", train_correct.shape[0] / y_train.shape[0])
 print("accuracy val: ", val_correct.shape[0] / y_val.shape[0])
 print("accuracy_test: ", test_correct.shape[0] / y_test.shape[0])
 
