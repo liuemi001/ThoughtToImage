@@ -6,6 +6,7 @@ import pprint
 from sklearn import tree
 from sklearn import ensemble
 from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LogisticRegression
 
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -19,9 +20,9 @@ block_splits_by_image_all_path = base_path + "block_splits_by_image_all.pth"
 block_splits_by_image_path = base_path + "block_splits_by_image_single.pth"
 
 
-features = np.loadtxt("ica_eeg_14_70_data.csv", delimiter=",", dtype=float)
-eeg_14_70_data = torch.load(eeg_14_70_path)
-labels = [data['label'] for data in eeg_14_70_data['dataset']]
+features = np.loadtxt("ica_eeg_5_95_data.csv", delimiter=",", dtype=float)
+eeg_5_95_data = torch.load(eeg_5_95_path)
+labels = [data['label'] for data in eeg_5_95_data['dataset']]
 labels = np.array(labels)
 features = np.reshape(features, [labels.size, int(features.size/labels.size)])
 
@@ -42,7 +43,9 @@ y_test = features[test_indices]
 
 # train on a couple different depths of decision trees
 #model = tree.DecisionTreeClassifier()
-model = ensemble.RandomForestClassifier()
+#model = ensemble.RandomForestClassifier()
+model = LogisticRegression(multi_class='ovr', solver='lbfgs')
+
 print("Training...")
 model.fit(x_train, y_train)
 
@@ -51,13 +54,19 @@ model.fit(x_train, y_train)
 # test on validation set
 print("predicting...")
 y_val_pred = model.predict(x_val)
+np.savetxt("logreg_val_predictions.csv", y_val_pred, delimiter=",")
 y_test_pred = model.predict(x_test)
+np.savetxt("logreg_test_predictions.csv", y_test_pred, delimiter=",")
 
 print("Calculating accuracy...")
-accuracy_val = accuracy_score(y_val.cpu().numpy(), y_val_pred)
-accuracy_test = accuracy_score(y_test.cpu().numpy(), y_test_pred)
-print("accuracy val: ", accuracy_val)
-print("accuracy_test: ", accuracy_test)
+print(labels)
+y_val_pred = np.loadtxt("logreg_val_predictions.csv", delimiter=",", dtype=float).astype(int)
+y_test_pred = np.loadtxt("logreg_test_predictions.csv", delimiter=",", dtype=float).astype(int)
+val_correct = np.intersect1d(y_val, y_val_pred)
+test_correct = np.intersect1d(y_test, y_test_pred)
+
+print("accuracy val: ", val_correct.shape[0] / y_val.shape[0])
+print("accuracy_test: ", test_correct.shape[0] / y_test.shape[0])
 
 # pick best tree
 
