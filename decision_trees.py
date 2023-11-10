@@ -42,12 +42,12 @@ x_test = features[test_indices]
 y_test = features[test_indices]
 
 # train on a couple different depths of decision trees
-#model = tree.DecisionTreeClassifier()
+model = tree.DecisionTreeClassifier()
 #model = ensemble.RandomForestClassifier()
-model = LogisticRegression(multi_class='ovr', solver='lbfgs')
+#model = LogisticRegression(multi_class='ovr', solver='lbfgs')
 
 print("Training...")
-#model.fit(x_train, y_train)
+model.fit(x_train, y_train)
 
 # plot results
 

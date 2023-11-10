@@ -24,7 +24,7 @@ eeg_5_95_data = torch.load(eeg_5_95_path)
 features = [data['eeg'] for data in eeg_5_95_data['dataset']]
 features = [data.cpu().numpy() for data in features]  # convert each eeg sample to a numpy array
 print("total number of samples: ", len(features))
-
+print(features[0].shape)
 ### ICA ###
 # ICA for each of the eeg tensors to compress into a reasonable number of features
 
