@@ -1,0 +1,3 @@
+[submodule "moabb"]
+	path = moabb
+	url = https://github.com/NeuroTechX/moabb
