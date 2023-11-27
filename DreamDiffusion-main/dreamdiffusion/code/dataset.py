@@ -106,14 +106,14 @@ def is_npy_ext(fname: Union[str, Path]) -> bool:
     return f'{ext}' == 'npy'# type: ignore
 
 class eeg_pretrain_dataset(Dataset):
-    def __init__(self, path='../dreamdiffusion/datasets/mne_data/', roi='VC', patch_size=16, transform=identity, aug_times=2, 
+    def __init__(self, path='../ThoughtsToImage/DreamDiffusion-main/dreamdiffusion/datasets/mne_data/', roi='VC', patch_size=16, transform=identity, aug_times=2, 
                 num_sub_limit=None, include_kam=False, include_hcp=True):
         super(eeg_pretrain_dataset, self).__init__()
         data = []
         images = []
-        #self.input_paths = [str(f) for f in sorted(Path(path).rglob('*')) if is_npy_ext(f) and os.path.isfile(f)]
-
-        self.input_paths = [path]
+        self.input_paths = [str(f) for f in sorted(Path(path).rglob('*')) if is_npy_ext(f) and os.path.isfile(f)]
+        # path = '../DreamDiffusion-main/dreamdiffusion/datasets/mne_data'
+        # self.input_paths = [path]
         assert len(self.input_paths) != 0, 'No data found'
         self.data_len  = 512
         self.data_chan = 128
@@ -387,8 +387,8 @@ class Splitter:
         return self.dataset[self.split_idx[i]]
 
 
-def create_EEG_dataset(eeg_signals_path='../dreamdiffusion/datasets/eeg_5_95_std.pth', 
-            splits_path = '../dreamdiffusion/datasets/block_splits_by_image_single.pth',
+def create_EEG_dataset(eeg_signals_path='../ThoughtToImage/DreamDiffusion-main/dreamdiffusion/datasets/eeg_5_95_std.pth', 
+            splits_path = '../ThoughtToImage/DreamDiffusion-main/dreamdiffusion/datasets/block_splits_by_image_single.pth',
             # splits_path = '../dreamdiffusion/datasets/block_splits_by_image_all.pth',
             image_transform=identity, subject = 0):
     # if subject == 0:

@@ -1,11 +1,11 @@
 import torch
 
-eeg_14_70_path = "C:/Users/aryaa/Downloads/data/eeg_14_70_std.pth" # Likely refers to freq range
-eeg_5_95_path = "C:/Users/aryaa/Downloads/data/eeg_5_95_std.pth"
-eeg_55_95_path = "C:/Users/aryaa/Downloads/data/eeg_55_95_std.pth"
-eeg_signals_raw_with_mean_path = "C:/Users/aryaa/Downloads/data/eeg_signals_raw_with_mean_std.pth"
-block_splits_by_image_all_path = "C:/Users/aryaa/Downloads/data/block_splits_by_image_all.pth"
-block_splits_by_image_path = "C:/Users/aryaa/Downloads/data/block_splits_by_image_single.pth"
+eeg_14_70_path = "../eeg_14_70_std.pth" # Likely refers to freq range
+eeg_5_95_path = "../DreamDiffusion-main/dreamdiffusion/datasets/eeg_5_95_std.pth"
+eeg_55_95_path = "../eeg_55_95_std.pth"
+eeg_signals_raw_with_mean_path = "../eeg_signals_raw_with_mean_std.pth"
+block_splits_by_image_all_path = "../DreamDiffusion-main/dreamdiffusion/datasets/block_splits_by_image_all.pth"
+block_splits_by_image_path = "../DreamDiffusion-main/dreamdiffusion/datasets/block_splits_by_image_single.pth"
 
 # ** How Everything Is Formatted **
 
@@ -56,10 +56,10 @@ import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 # ** eeg_14_70 (same can be done for eeg_5_95, eeg_55_95) ** 
-# eeg_14_70_data = torch.load(eeg_14_70_path)
-# pp.pprint(eeg_14_70_data['dataset'][:5])  # First 5 entries of the 'dataset'
-# print("Labels sample:", eeg_14_70_data['labels'][:5])  # First 5 labels
-# print("Images sample:", daeeg_14_70_datata['images'][:5])  # First 5 images
+eeg_14_70_data = torch.load(eeg_14_70_path)
+pp.pprint(eeg_14_70_data['dataset'][:5])  # First 5 entries of the 'dataset'
+print("Labels sample:", eeg_14_70_data['labels'][:5])  # First 5 labels
+print("Images sample:", eeg_14_70_data['images'][:5])  # First 5 images
 
 # ** eeg_signals_raw_with_mean ** 
 # eeg_signals_raw_with_mean_data = torch.load(eeg_signals_raw_with_mean)
@@ -67,5 +67,5 @@ pp = pprint.PrettyPrinter(indent=4)
 # print(eeg_signals_raw_with_mean_data['means'][0])
 
 # ** block_splits_by_image_all ** 
-block_splits_by_image_all_data = torch.load(block_splits_by_image_all_path)
-print(block_splits_by_image_all_data['splits'][0]['train'])
+# block_splits_by_image_all_data = torch.load(block_splits_by_image_all_path)
+# print(block_splits_by_image_all_data['splits'][0]['train'])
