@@ -1,5 +1,7 @@
 /DreamDiffusion-main/dreamdiffusion/datasets
-/DreamDiffusion-main/dreamdiffusion/pretrains/
+/test_save_path
+/res_test
 /DreamDiffusion-main/code/__pycache__
 /DreamDiffusion-main/code/sc_mbm/__pycache__
 /baseline_results
+*.pth
