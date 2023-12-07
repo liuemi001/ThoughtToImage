@@ -2,10 +2,14 @@ import torch
 import numpy as np
 from scipy.signal import welch
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from pprint import pprint
 import dataset
+import pyeeg 
 
 base_path = "../ThoughtToImage/DreamDiffusion-main/dreamdiffusion/datasets/"
 eeg_14_70_path = base_path + "eeg_14_70_std.pth" # Likely refers to freq range
@@ -16,9 +20,16 @@ block_splits_by_image_all_path = base_path + "block_splits_by_image_all.pth"
 block_splits_by_image_path = base_path + "block_splits_by_image_single.pth"
 
 def extract_features(eeg_sample):
+    """
+    Extract features like mean, variance, power in different frequency bands, [stuff from pyeeg] from
+    a single EEG reading
+    Params: 
+        - eeg_sample: PyTorch tensor that represents one eeg sample with varying number of channels and
+                      captured timesteps
+    Returns: 
+        - list of features corresponding to the eeg sample
+    """
     # time-domain features
-    # mean = eeg_sample.mean()
-    # variance = eeg_sample.var()
     mean = torch.mean(eeg_sample)
     variance = torch.var(eeg_sample)
     
@@ -48,12 +59,15 @@ def define_model():
 
 def train_and_evaluate(X_train, y_train, X_test, y_test, model):
     model.fit(X_train, y_train)
-    predictions = model.predict(X_test)
-    accuracy = accuracy_score(y_test, predictions)
-    return accuracy
+    train_predictions = model.predict(X_train)
+    val_predictions = model.predict(X_test)
+    train_accuracy = accuracy_score(y_train, train_predictions)
+    val_accuracy = accuracy_score(y_test, val_predictions)
+    return train_accuracy, val_accuracy
 
 def main():
     # Load data
+    print("Loading data...")
     data = torch.load(eeg_55_95_path)
     print(data.keys())
     print(data['dataset'][0])
@@ -62,25 +76,21 @@ def main():
     
     # Construct dataset
     X, y = construct_dataset(data)
-    
-    # Split data
-    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Split data using channel selection, pregiven splits
+    print("Creating splits and extracting features...")
     X_train, y_train, X_val, y_val = dataset.create_EEG_dataset(eeg_55_95_path, "", block_splits_by_image_all_path)
     X_train = [extract_features(x) for x in X_train]
-    print("len x_Train: ", len(X_train))
-    print("len y train: ", len(y_train))
     X_val  = [extract_features(x) for x in X_val]
-    print("len x val: ", len(X_val))
-    print("len y val: ", len(y_val))
 
     # Define model
     model = define_model()
     
     # Train and evaluate
-    accuracy = train_and_evaluate(X_train, y_train, X_val, y_val, model)
-    print(f"Val Accuracy: {accuracy:.2f}")
+    print("Training...")
+    train_accuracy, val_accuracy = train_and_evaluate(X_train, y_train, X_val, y_val, model)
+    print(f"Train Accuracy: {train_accuracy:.2f}")
+    print(f"Val Accuracy: {val_accuracy:.2f}")
 
 if __name__ == "__main__":
     main()

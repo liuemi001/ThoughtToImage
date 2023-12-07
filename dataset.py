@@ -2,9 +2,12 @@ import torch
 from torch.utils.data import Dataset
 import os
 import numpy as np
+import random
 
-channels = [39, 47, 58, 66, 76, 84, 96, 100, 116, 117, 120, 121, 122, 123, 124, 125, 126, 127]
-
+#channels = [39, 47, 58, 66, 76, 84, 96, 100, 116, 117, 120, 121, 122, 123, 124, 125, 126, 127]
+#channels = random.sample(range(128), 18)
+channels = list(range(128))
+print("Chosen channels: ", channels)
 class EEGDataset(Dataset):
     """
     A dataset class for loading and transforming EEG and corresponding ImageNet data.
@@ -15,7 +18,6 @@ class EEGDataset(Dataset):
         
         self.data = [trim_eeg_sample(item['eeg'], channels) for item in loaded['dataset'] 
                               if (item['subject'] == subject or subject == 0)]
-        print("data entry 1: ", self.data[0].shape)
         # self.data = [item for item in loaded['dataset'] if (item['subject'] == subject or subject == 0)]
         self.labels = np.array([item['label'] for item in loaded['dataset'] 
                                 if (item['subject'] == subject or subject == 0)])
@@ -75,6 +77,10 @@ class Splitter:
         return eeg, label
     
     def get_split_sets(self): 
+        """
+        Return the train/test splits for X and y from the dataset and splits set
+        stored as class variables
+        """
         x_split = [self.dataset.data[i] for i in self.split_idx]
         y_split = self.dataset.labels[self.split_idx]
         return x_split, y_split
