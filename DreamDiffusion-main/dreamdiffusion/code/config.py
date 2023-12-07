@@ -58,7 +58,7 @@ class Config_EEG_finetune(Config_MBM_finetune):
         # self.root_path = '.'
         self.output_path = '../dreamdiffusion/exps/'
 
-        self.eeg_signals_path = os.path.join(self.root_path, 'datasets/eeg_5_95_std.pth')
+        self.eeg_signals_path = os.path.join(self.root_path, 'datasets/eeg_5_95_std.pth') 
         self.splits_path = os.path.join(self.root_path, 'datasets/block_splits_by_image_all.pth')
 
         self.dataset = 'EEG' 
@@ -91,8 +91,9 @@ class Config_Generative_Model:
         self.seed = 2022
         self.root_path = '../dreamdiffusion/'
         self.output_path = '../dreamdiffusion/exps/'
-
+        
         self.eeg_signals_path = os.path.join(self.root_path, 'datasets/eeg_5_95_std.pth')
+
         self.splits_path = os.path.join(self.root_path, 'datasets/block_splits_by_image_single.pth')
         # self.splits_path = os.path.join(self.root_path, 'datasets/block_splits_by_image_all.pth')
         self.roi = 'VC'

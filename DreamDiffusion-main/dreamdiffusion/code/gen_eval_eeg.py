@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
     
     splits_path = "../dreamdiffusion/datasets/block_splits_by_image_single.pth"
-    dataset_train, dataset_test = create_EEG_dataset(eeg_signals_path = config.eeg_signals_path, splits_path = splits_path, 
+    dataset_train, dataset_test = create_EEG_dataset(eeg_signals_path = "../dreamdiffusion/datasets/eeg_5_95_std.pth", splits_path = splits_path, 
                 image_transform=[img_transform_train, img_transform_test], subject = 4)
     num_voxels = dataset_test.dataset.data_len
 

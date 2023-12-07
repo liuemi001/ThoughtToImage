@@ -68,26 +68,42 @@ class RBM(nn.Module):
         return (-hidden_term - vbias_term).mean()
    
 
-def main(): 
-    rbm = RBM(k=1)
-    train_op = optim.SGD(rbm.parameters(),0.1)
+# def main(): 
+rbm = RBM(n_vis=500, n_hin=250, k=1)
+train_op = optim.SGD(rbm.parameters(),0.1)
 
-    # TODO: load EEG data
+base_path = "../ThoughtToImage/DreamDiffusion-main/dreamdiffusion/datasets/"
+eeg_5_95_path = base_path + "eeg_5_95_std.pth"
+eeg_5_95_data = torch.load(eeg_5_95_path)
+all_data = eeg_5_95_data['dataset']
+batch_size = 1000
+num_exps = len(all_data)
+num_batches = int(num_exps / batch_size)
+print("number training examples: ", num_exps)
 
-    for epoch in range(10):
-        loss_ = []
-        for _, (data,target) in enumerate(train_loader):  # TODO: change to our data
-            data = Variable(data.view(-1,784))
-            sample_data = data.bernoulli()
-            
-            v,v1 = rbm(sample_data)
-            loss = rbm.free_energy(v) - rbm.free_energy(v1)
-            loss_.append(loss.data)
-            train_op.zero_grad()
-            loss.backward()
-            train_op.step()
 
-        print("Training loss for {} epoch: {}".format(epoch, np.mean(loss_)))
+for epoch in range(10):
+    loss_ = []
+    for i in range(num_exps):  # TODO: change to our data
+        # data.view(-1, 784) is making it be size batch size, flattened vector for each image
+        #data = Variable(data.view(-1,784))  # Variable is like a tensor
+        #sample_data = data.bernoulli()
+        start = i * batch_size
+        end = min((i+1)*batch_size, num_exps)
+        # data = [all_data[start + i]['eeg'] for i in range(start, end)]  # this should already be in tensor form
+        # data = torch.Tensor(data)
+        # data = Variable(data.view(-1, 64000))
+        data = all_data[i]['eeg']
+        #target = all_data[start:end]['label']
+        
+        v,v1 = rbm(data)
+        loss = rbm.free_energy(v) - rbm.free_energy(v1)
+        loss_.append(loss.data)
+        train_op.zero_grad()
+        loss.backward()
+        train_op.step()
+
+    print("Training loss for {} epoch: {}".format(epoch, np.mean(loss_)))
 
 if __name__ == 'main':
     main()

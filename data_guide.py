@@ -54,12 +54,15 @@ block_splits_by_image_path = "../DreamDiffusion-main/dreamdiffusion/datasets/blo
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
-
+base_path = "../ThoughtToImage/DreamDiffusion-main/dreamdiffusion/datasets/"
+eeg_5_95_path = base_path + "eeg_5_95_std.pth"
 # ** eeg_14_70 (same can be done for eeg_5_95, eeg_55_95) ** 
-eeg_14_70_data = torch.load(eeg_14_70_path)
-pp.pprint(eeg_14_70_data['dataset'][:5])  # First 5 entries of the 'dataset'
-print("Labels sample:", eeg_14_70_data['labels'][:5])  # First 5 labels
-print("Images sample:", eeg_14_70_data['images'][:5])  # First 5 images
+eeg_5_95_data = torch.load(eeg_5_95_path)
+pp.pprint(eeg_5_95_data['dataset'][:5])  # First 5 entries of the 'dataset'
+print("eeg data 0 dimensions: ", eeg_5_95_data['dataset'][0]['eeg'].shape)
+print("eeg data 1 dimensions: ", eeg_5_95_data['dataset'][1]['eeg'].shape)
+print("Labels sample:", eeg_5_95_data['labels'][:5])  # First 5 labels
+print("Images sample:", eeg_5_95_data['images'][:5])  # First 5 images
 
 # ** eeg_signals_raw_with_mean ** 
 # eeg_signals_raw_with_mean_data = torch.load(eeg_signals_raw_with_mean)
