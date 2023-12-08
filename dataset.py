@@ -96,10 +96,13 @@ def create_EEG_dataset(eeg_signals_path, imagenet_path, splits_path, subject=0, 
     A function to create and split EEG dataset for training and testing.
     Returns them as numpy arrays.
     """
+    print("Creating EEG dataset from dataset.py ...")
     dataset = EEGDataset(eeg_signals_path, imagenet_path, subject, time_low, time_high)
     split_train = Splitter(dataset, splits_path, split_num=0, split_name='train')
     x_train, y_train = split_train.get_split_sets()
     split_val = Splitter(dataset, splits_path, split_num=0, split_name='val')
     x_val, y_val = split_val.get_split_sets()
+    print("Created EEG dataset from dataset.py")
     return x_train, y_train, x_val, y_val
+    
 

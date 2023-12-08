@@ -3,3 +3,9 @@
 /DreamDiffusion-main/code/__pycache__
 /DreamDiffusion-main/code/sc_mbm/__pycache__
 /baseline_results
+/datasets
+/features.pkl
+/dreamdiffusion
+/DreamDiffusion-main
+/eeg_signal_classification
+/5_95_classification.txt

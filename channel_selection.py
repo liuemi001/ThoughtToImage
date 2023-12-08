@@ -29,7 +29,6 @@ class ChannelSelection(object):
         return self.temporal_channels_18 + self.parietal_channels_18 + self.occipital_channels_18
         
 
-
 def main(): 
     selector = ChannelSelection(eeg_55_95_path)
 

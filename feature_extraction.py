@@ -2,6 +2,7 @@ import torch
 import numpy as np
 from scipy.signal import welch
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
@@ -9,9 +10,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from pprint import pprint
 import dataset
-import pyeeg 
+import pyeeg
+from multiprocessing import Pool
+import time
+import pickle
+import os
 
-base_path = "../ThoughtToImage/DreamDiffusion-main/dreamdiffusion/datasets/"
+# base_path = "../ThoughtToImage/DreamDiffusion-main/dreamdiffusion/datasets/"
+base_path = "datasets/"
 eeg_14_70_path = base_path + "eeg_14_70_std.pth" # Likely refers to freq range
 eeg_5_95_path = base_path + "eeg_5_95_std.pth"
 eeg_55_95_path = base_path + "eeg_55_95_std.pth"
@@ -22,7 +28,7 @@ block_splits_by_image_path = base_path + "block_splits_by_image_single.pth"
 class VisualClassifer(object): 
 
     def __init__(self, eeg_path, splits_path, model=None, time_feats=True, pyeeg_feats=True):
-        self.model = RandomForestClassifier()  # model to use. default to RandomForest
+        self.model = RandomForestClassifier(max_depth=30, min_samples_leaf=2) 
 
         # paths to data
         self.eeg_path = eeg_path
@@ -86,13 +92,42 @@ class VisualClassifer(object):
         return features
 
     def construct_dataset(self):
+        print("Beginning dataset construction ...")
         self.X_train, self.y_train, self.X_val, self.y_val = dataset.create_EEG_dataset(self.eeg_path, "", self.splits_path)
-        self.X_train = [self.extract_features(x) for x in self.X_train]
-        self.X_val  = [self.extract_features(x) for x in self.X_val]
-
+        print("Starting feature extraction ...")
+        features_file = 'features.pkl'
+        if os.path.exists(features_file):
+            # Load features from the file
+            with open(features_file, 'rb') as f:
+                self.X_train, self.X_val = pickle.load(f)
+        else: 
+            self.X_train = [self.extract_features(x) for x in self.X_train]
+            self.X_val  = [self.extract_features(x) for x in self.X_val]
+            # Save features to file 
+            with open(features_file, 'wb') as f:
+                pickle.dump((self.X_train, self.X_val), f)
+        print("Finished feature extraction.")
+        print("Finished dataset construction.")
 
     def train_and_evaluate(self):
+        # param_grid = {
+        #     'n_estimators': [100, 200, 300],
+        #     'max_features': ['auto', 'sqrt'],
+        #     'max_depth': [10, 20, 30, None],
+        #     'min_samples_split': [2, 5, 10],
+        #     'min_samples_leaf': [1, 2, 4],
+        #     'bootstrap': [True, False]
+        # }
+        # grid_search = GridSearchCV(estimator=self.model, param_grid=param_grid,
+        #                            cv=3, n_jobs=-1, verbose=2, scoring='accuracy')
+        
+        # grid_search.fit(self.X_train, self.y_train)
+        # self.model = grid_search.best_estimator_
+        # print(self.model)
+        
+        print("Fitting model ...")
         self.model.fit(self.X_train, self.y_train)
+        print("Fit completed.")
         train_predictions = self.model.predict(self.X_train)
         val_predictions = self.model.predict(self.X_val)
         train_accuracy = accuracy_score(self.y_train, train_predictions)
@@ -108,9 +143,12 @@ def main():
 
     # Train and evaluate
     print("Training...")
+    start_time = time.time()
     train_accuracy, val_accuracy = clf.train_and_evaluate()
+    end_time = time.time()
     print(f"Train Accuracy: {train_accuracy:.2f}")
     print(f"Val Accuracy: {val_accuracy:.2f}")
+    print(f"Time taken to train: {end_time - start_time} seconds")
 
 if __name__ == "__main__":
     main()
