@@ -3,3 +3,6 @@
 /DreamDiffusion-main/code/__pycache__
 /DreamDiffusion-main/code/sc_mbm/__pycache__
 /baseline_results
+/DreamDiffusion-main/dreamdiffusion/
+/dreamdiffusion/
+/.gitignore
