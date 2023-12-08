@@ -28,7 +28,10 @@ block_splits_by_image_path = base_path + "block_splits_by_image_single.pth"
 class VisualClassifer(object): 
 
     def __init__(self, eeg_path, splits_path, model=None, time_feats=True, pyeeg_feats=True):
-        self.model = RandomForestClassifier(max_depth=30, min_samples_leaf=2) 
+        if model != None: 
+            self.model = model
+        else: 
+            self.model = RandomForestClassifier(max_depth=30, min_samples_leaf=2)  # model to use. default to RandomForest
 
         # paths to data
         self.eeg_path = eeg_path
@@ -64,6 +67,8 @@ class VisualClassifer(object):
             features += [mean.item(), variance.item()]
         
         # frequency-domain features (Welch's method)
+        # if using pyeeg features, we are already calculating channel specific power and don't need 
+        # to add redundant average power features
         if not self.pyeeg_feats: 
             freqs, psd = welch(eeg_sample.numpy(), fs=250) # sampling frequency of 250Hz, can up to 1000Hz # can remove .numpy()
             avg_psd = np.mean(psd, axis=0)
@@ -91,23 +96,11 @@ class VisualClassifer(object):
 
         return features
 
-    def construct_dataset(self):
-        print("Beginning dataset construction ...")
-        self.X_train, self.y_train, self.X_val, self.y_val = dataset.create_EEG_dataset(self.eeg_path, "", self.splits_path)
-        print("Starting feature extraction ...")
-        features_file = 'features.pkl'
-        if os.path.exists(features_file):
-            # Load features from the file
-            with open(features_file, 'rb') as f:
-                self.X_train, self.X_val = pickle.load(f)
-        else: 
-            self.X_train = [self.extract_features(x) for x in self.X_train]
-            self.X_val  = [self.extract_features(x) for x in self.X_val]
-            # Save features to file 
-            with open(features_file, 'wb') as f:
-                pickle.dump((self.X_train, self.X_val), f)
-        print("Finished feature extraction.")
-        print("Finished dataset construction.")
+    def construct_dataset(self, channel):
+        self.X_train, self.y_train, self.X_val, self.y_val = dataset.create_EEG_dataset(self.eeg_path, channels, self.splits_path)
+        self.X_train = [self.extract_features(x) for x in self.X_train]
+        self.X_val  = [self.extract_features(x) for x in self.X_val]
+
 
     def train_and_evaluate(self):
         # param_grid = {
@@ -136,14 +129,24 @@ class VisualClassifer(object):
     
 
 def main():
+    # Load channels selected separately using ChannelSelector
+    svd_channels = [106, 85, 55, 52, 102, 32, 35, 98, 36, 71, 73, 72, 101, 105, 69, 67, 70, 45]
+    spectral_channels = [102, 100, 65, 19, 64, 24, 18, 25, 13, 20, 52, 22, 29, 37, 27, 26, 80, 17]
+    var_channels = [127, 50, 97, 102, 32, 35, 123, 101, 107, 36, 98, 126, 112, 45, 73, 106, 6, 119]
+
     # Load and split data using channel selection, pregiven splits
     print("Initializing model and extracting features...")
     clf = VisualClassifer(eeg_55_95_path, block_splits_by_image_all_path)
-    clf.construct_dataset()
+
+    # Train and evaluate on SVD Channels
+    clf.construct_dataset(svd_channels)
+    print("Training on SVD Channels...")
+    train_accuracy, val_accuracy = clf.train_and_evaluate()
+    print(f"Train Accuracy: {train_accuracy:.2f}")
+    print(f"Val Accuracy: {val_accuracy:.2f}")
 
     # Train and evaluate
     print("Training...")
-    start_time = time.time()
     train_accuracy, val_accuracy = clf.train_and_evaluate()
     end_time = time.time()
     print(f"Train Accuracy: {train_accuracy:.2f}")
