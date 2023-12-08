@@ -112,10 +112,11 @@ def main():
     var_channels = [127, 50, 97, 102, 32, 35, 123, 101, 107, 36, 98, 126, 112, 45, 73, 106, 6, 119]
 
     # Load and split data using channel selection, pregiven splits
-    print("Initializing model and extracting features...")
+    print("Initializing model...")
     clf = VisualClassifer(eeg_55_95_path, block_splits_by_image_all_path)
 
     # Train and evaluate on SVD Channels
+    print("Extracting SVD Channel features...")
     clf.construct_dataset(svd_channels)
     print("Training on SVD Channels...")
     train_accuracy, val_accuracy = clf.train_and_evaluate()
@@ -123,6 +124,7 @@ def main():
     print(f"Val Accuracy: {val_accuracy:.2f}")
 
     # Train and evaluate on spec Channels
+    print("Extracting SVD Channel features...")
     clf.construct_dataset(spectral_channels)
     print("Training on Spectral Entropy Channels...")
     train_accuracy, val_accuracy = clf.train_and_evaluate()
@@ -130,6 +132,7 @@ def main():
     print(f"Val Accuracy: {val_accuracy:.2f}")
 
     # Train and evaluate on variance Channels
+    print("Extracting SVD Channel features...")
     clf.construct_dataset(var_channels)
     print("Training on Variance Channels...")
     train_accuracy, val_accuracy = clf.train_and_evaluate()

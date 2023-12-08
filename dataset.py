@@ -22,8 +22,9 @@ class EEGDataset(Dataset):
     def __init__(self, eeg_signals_path, channels, imagenet_path=None, subject=0, time_low=20, time_high=460):
         # Load EEG signals
         loaded = torch.load(eeg_signals_path)
+        subject = 0
         
-        self.data = [trim_eeg_sample(item['eeg'], channels) for item in loaded['dataset'] 
+        self.data = [trim_eeg_sample(item['eeg'], channels) for item in loaded['dataset']
                               if (item['subject'] == subject or subject == 0)]
         # self.data = [item for item in loaded['dataset'] if (item['subject'] == subject or subject == 0)]
         self.labels = np.array([item['label'] for item in loaded['dataset'] 
