@@ -96,7 +96,7 @@ class VisualClassifer(object):
 
         return features
 
-    def construct_dataset(self, channel):
+    def construct_dataset(self, channels):
         self.X_train, self.y_train, self.X_val, self.y_val = dataset.create_EEG_dataset(self.eeg_path, channels, self.splits_path)
         self.X_train = [self.extract_features(x) for x in self.X_train]
         self.X_val  = [self.extract_features(x) for x in self.X_val]
