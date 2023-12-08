@@ -12,13 +12,14 @@ import random
 #channels = [96, 100, 116, 117]  # parietal only
 #channels = [39, 47, 58, 66, 76, 84, 96, 100, 116, 117]  # temporal and parietal 
 #channels = [39, 58, 76, 96, 116]  # temporal and parietal left side
-channels = list(range(128))
-print("Chosen channels: ", channels)
+#channels = list(range(128))
+#print("Chosen channels: ", channels)
+
 class EEGDataset(Dataset):
     """
     A dataset class for loading and transforming EEG and corresponding ImageNet data.
     """
-    def __init__(self, eeg_signals_path, imagenet_path=None, subject=0, time_low=20, time_high=460):
+    def __init__(self, eeg_signals_path, channels, imagenet_path=None, subject=0, time_low=20, time_high=460):
         # Load EEG signals
         loaded = torch.load(eeg_signals_path)
         
@@ -91,12 +92,12 @@ class Splitter:
         y_split = self.dataset.labels[self.split_idx]
         return x_split, y_split
 
-def create_EEG_dataset(eeg_signals_path, imagenet_path, splits_path, subject=0, time_low=20, time_high=460):
+def create_EEG_dataset(eeg_signals_path, channels, splits_path, subject=0, time_low=20, time_high=460):
     """
     A function to create and split EEG dataset for training and testing.
     Returns them as numpy arrays.
     """
-    dataset = EEGDataset(eeg_signals_path, imagenet_path, subject, time_low, time_high)
+    dataset = EEGDataset(eeg_signals_path, channels, subject, time_low, time_high)
     split_train = Splitter(dataset, splits_path, split_num=0, split_name='train')
     x_train, y_train = split_train.get_split_sets()
     split_val = Splitter(dataset, splits_path, split_num=0, split_name='val')
