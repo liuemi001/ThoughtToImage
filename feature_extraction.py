@@ -29,9 +29,12 @@ def extract_features(eeg_sample):
     Returns: 
         - list of features corresponding to the eeg sample
     """
+    features = []
+
     # time-domain features
     mean = torch.mean(eeg_sample)
     variance = torch.var(eeg_sample)
+    features += [mean.item(), variance.item()]
     
     # frequency-domain features (Welch's method)
     freqs, psd = welch(eeg_sample.numpy(), fs=250) # sampling frequency of 250Hz, can up to 1000Hz # can remove .numpy()
@@ -43,8 +46,20 @@ def extract_features(eeg_sample):
         idx_band = np.logical_and(freqs >= low_freq, freqs <= high_freq)
         band_power = avg_psd[idx_band].sum()
         band_powers[band] = band_power
+    features += list(band_powers.values())
 
-    features = [mean.item(), variance.item()] + list(band_powers.values())
+    # pyeeg features
+    print("Extracting pyeeg features...")
+    num_channels = eeg_sample.size(0)
+    for i in range(num_channels):
+        channel = eeg_sample[i].numpy()
+        hjorth_mobility, hjorth_complexity = pyeeg.hjorth(channel)
+        hurst = pyeeg.hurst(channel)
+        tau, de = 2, 20
+        svd_entropy = pyeeg.svd_entropy(channel, tau, de)
+        features += [hjorth_mobility, hjorth_complexity, hurst, svd_entropy]
+
+    #features = [mean.item(), variance.item()] + list(band_powers.values())
     return features
 
 def construct_dataset(data):
@@ -66,18 +81,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, model):
     return train_accuracy, val_accuracy
 
 def main():
-    # Load data
-    print("Loading data...")
-    data = torch.load(eeg_55_95_path)
-    print(data.keys())
-    print(data['dataset'][0])
-    print(data['labels'][0])
-    print(data['images'][0])
-    
-    # Construct dataset
-    X, y = construct_dataset(data)
-
-    # Split data using channel selection, pregiven splits
+    # Load and split data using channel selection, pregiven splits
     print("Creating splits and extracting features...")
     X_train, y_train, X_val, y_val = dataset.create_EEG_dataset(eeg_55_95_path, "", block_splits_by_image_all_path)
     X_train = [extract_features(x) for x in X_train]
