@@ -22,7 +22,10 @@ block_splits_by_image_path = base_path + "block_splits_by_image_single.pth"
 class VisualClassifer(object): 
 
     def __init__(self, eeg_path, splits_path, model=None, time_feats=True, pyeeg_feats=True):
-        self.model = RandomForestClassifier()  # model to use. default to RandomForest
+        if model != None: 
+            self.model = model
+        else: 
+            self.model = RandomForestClassifier()  # model to use. default to RandomForest
 
         # paths to data
         self.eeg_path = eeg_path
@@ -58,6 +61,8 @@ class VisualClassifer(object):
             features += [mean.item(), variance.item()]
         
         # frequency-domain features (Welch's method)
+        # if using pyeeg features, we are already calculating channel specific power and don't need 
+        # to add redundant average power features
         if not self.pyeeg_feats: 
             freqs, psd = welch(eeg_sample.numpy(), fs=250) # sampling frequency of 250Hz, can up to 1000Hz # can remove .numpy()
             avg_psd = np.mean(psd, axis=0)

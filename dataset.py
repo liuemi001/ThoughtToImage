@@ -10,9 +10,9 @@ import random
 #channels = [96, 100, 116, 117, 120, 121, 122, 123, 124, 125]  # Parietal and occipital
 #channels = [39, 47, 58, 66, 76, 84]  # temporal channels only
 #channels = [96, 100, 116, 117]  # parietal only
-channels = [39, 47, 58, 66, 76, 84, 96, 100, 116, 117]  # temporal and parietal 
+#channels = [39, 47, 58, 66, 76, 84, 96, 100, 116, 117]  # temporal and parietal 
 #channels = [39, 58, 76, 96, 116]  # temporal and parietal left side
-#channels = list(range(128))
+channels = list(range(128))
 print("Chosen channels: ", channels)
 class EEGDataset(Dataset):
     """
