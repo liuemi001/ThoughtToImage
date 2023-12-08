@@ -49,7 +49,6 @@ def extract_features(eeg_sample):
     features += list(band_powers.values())
 
     # pyeeg features
-    print("Extracting pyeeg features...")
     num_channels = eeg_sample.size(0)
     for i in range(num_channels):
         channel = eeg_sample[i].numpy()
