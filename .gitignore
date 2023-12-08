@@ -6,3 +6,9 @@
 /DreamDiffusion-main/dreamdiffusion/
 /dreamdiffusion/
 /.gitignore
+/datasets
+/features.pkl
+/dreamdiffusion
+/DreamDiffusion-main
+/eeg_signal_classification
+/5_95_classification.txt

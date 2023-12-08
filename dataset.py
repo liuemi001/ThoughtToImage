@@ -103,5 +103,7 @@ def create_EEG_dataset(eeg_signals_path, channels, splits_path, subject=0, time_
     x_train, y_train = split_train.get_split_sets()
     split_val = Splitter(dataset, splits_path, split_num=0, split_name='val')
     x_val, y_val = split_val.get_split_sets()
+    print("Created EEG dataset from dataset.py")
     return x_train, y_train, x_val, y_val
+    
 
