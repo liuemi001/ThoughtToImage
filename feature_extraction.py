@@ -16,8 +16,8 @@ import time
 import pickle
 import os
 
-# base_path = "../ThoughtToImage/DreamDiffusion-main/dreamdiffusion/datasets/"
-base_path = "datasets/"
+base_path = "../ThoughtToImage/DreamDiffusion-main/dreamdiffusion/datasets/"
+#base_path = "datasets/"
 eeg_14_70_path = base_path + "eeg_14_70_std.pth" # Likely refers to freq range
 eeg_5_95_path = base_path + "eeg_5_95_std.pth"
 eeg_55_95_path = base_path + "eeg_55_95_std.pth"
@@ -74,7 +74,7 @@ class VisualClassifer(object):
             avg_psd = np.mean(psd, axis=0)
 
             band_powers = {}
-            bands = {'delta': (1, 4), 'theta': (4, 8), 'alpha': (8, 12), 'beta': (12, 30), 'gamma': (30, 45)}
+            bands = {'delta': (1, 4), 'theta': (4, 8), 'alpha': (8, 12), 'sigma': (12, 16), 'beta': (16, 30), 'gamma': (30, 80), 'ripples': (80, 100)}
             for band, (low_freq, high_freq) in bands.items():
                 idx_band = np.logical_and(freqs >= low_freq, freqs <= high_freq)
                 band_power = avg_psd[idx_band].sum()
@@ -87,12 +87,12 @@ class VisualClassifer(object):
             for i in range(num_channels):
                 channel = eeg_sample[i].numpy()
                 hjorth_mobility, hjorth_complexity = pyeeg.hjorth(channel)
-                hurst = pyeeg.hurst(channel)
-                tau, de = 2, 20
-                svd_entropy = pyeeg.svd_entropy(channel, tau, de)
+                #hurst = pyeeg.hurst(channel)
+                # tau, de = 2, 20
+                # svd_entropy = pyeeg.svd_entropy(channel, tau, de)
                 pfd = pyeeg.pfd(channel)
-                power, power_ratio = pyeeg.bin_power(channel, [1, 4, 8, 12, 30, 45], 250)  # freq bins, samp freq of 250 Hz
-                features += [hjorth_mobility, hjorth_complexity, hurst, svd_entropy, pfd] + list(power) 
+                power, power_ratio = pyeeg.bin_power(channel, [1, 4, 8, 12, 16, 30, 80, 100], 250)  # freq bins, samp freq of 250 Hz
+                features += [hjorth_mobility, hjorth_complexity, pfd] + list(power) 
 
         return features
 
@@ -133,36 +133,87 @@ def main():
     svd_channels = [106, 85, 55, 52, 102, 32, 35, 98, 36, 71, 73, 72, 101, 105, 69, 67, 70, 45]
     spectral_channels = [102, 100, 65, 19, 64, 24, 18, 25, 13, 20, 52, 22, 29, 37, 27, 26, 80, 17]
     var_channels = [127, 50, 97, 102, 32, 35, 123, 101, 107, 36, 98, 126, 112, 45, 73, 106, 6, 119]
+    physio_channels = [39, 47, 58, 66, 76, 84, 96, 100, 116, 117]
+    all_physio_channels = [39, 47, 58, 66, 76, 84, 96, 100, 116, 117, 120, 121, 122, 123, 124, 125, 126, 127]
+    all_channels = list(range(128))
 
     # Load and split data using channel selection, pregiven splits
     print("Initializing model...")
     clf = VisualClassifer(eeg_55_95_path, block_splits_by_image_all_path)
 
-    # Train and evaluate on SVD Channels
-    print("Extracting SVD Channel features...")
-    clf.construct_dataset(svd_channels)
-    print("Training on SVD Channels...")
+    # # Train and evaluate on SVD Channels
+    # print("Extracting SVD Channel features...")
+    # clf.construct_dataset(svd_channels)
+    # print("Training on SVD Channels...")
+    # train_accuracy, val_accuracy = clf.train_and_evaluate()
+    # print(f"Train Accuracy: {train_accuracy:.2f}")
+    # print(f"Val Accuracy: {val_accuracy:.2f}")
+
+    # # Train and evaluate on spec Channels
+    # print("Extracting spectral Channel features...")
+    # clf.construct_dataset(spectral_channels)
+    # print("Training on Spectral Entropy Channels...")
+    # start_time = time.time()
+    # train_accuracy, val_accuracy = clf.train_and_evaluate()
+    # end_time = time.time()
+    # print(f"Train Accuracy: {train_accuracy:.2f}")
+    # print(f"Val Accuracy: {val_accuracy:.2f}")
+    # print(f"Time taken to train: {end_time - start_time} seconds")
+
+    # # Train and evaluate on variance Channels
+    # var_channels.sort()
+    # print("Extracting var Channel features...")
+    # clf.construct_dataset(var_channels)
+    # print("Training on Variance Channels...")
+    # train_accuracy, val_accuracy = clf.train_and_evaluate()
+    # print(f"Train Accuracy: {train_accuracy:.2f}")
+    # print(f"Val Accuracy: {val_accuracy:.2f}")
+
+    # #Train and evaluate on SVD + variance Channels
+    # SVD_var = list(set(svd_channels + var_channels))
+    # SVD_var.sort()
+    # print("Extracting SVD + var Channel features...")
+    # clf.construct_dataset(SVD_var)
+    # print("Training on SVD + Variance Channels...")
+    # train_accuracy, val_accuracy = clf.train_and_evaluate()
+    # print(f"Train Accuracy: {train_accuracy:.2f}")
+    # print(f"Val Accuracy: {val_accuracy:.2f}")
+
+    # # Train and evaluate on temporal + parietal Channels
+    # print("Extracting physio Channel features (temporal and parietal)...")
+    # clf.construct_dataset(physio_channels)
+    # print("Training on physio Channels...")
+    # train_accuracy, val_accuracy = clf.train_and_evaluate()
+    # print(f"Train Accuracy: {train_accuracy:.2f}")
+    # print(f"Val Accuracy: {val_accuracy:.2f}")
+
+    # # Train and evaluate on temporal + parietal + occipital Channels
+    # print("Extracting physio Channel features (temporal and parietal and occipital)...")
+    # clf.construct_dataset(all_physio_channels)
+    # print("Training on physio Channels...")
+    # train_accuracy, val_accuracy = clf.train_and_evaluate()
+    # print(f"Train Accuracy: {train_accuracy:.2f}")
+    # print(f"Val Accuracy: {val_accuracy:.2f}")
+
+    # # Train and evaluate on combo Channels
+    # spec_and_physio = list(set(physio_channels + spectral_channels + var_channels))
+    # spec_and_physio.sort()
+    # print("Extracting all physio Channel features...")
+    # clf.construct_dataset(spec_and_physio)
+    # print("Training on all physio Channels...")
+    # train_accuracy, val_accuracy = clf.train_and_evaluate()
+    # print(f"Train Accuracy: {train_accuracy:.2f}")
+    # print(f"Val Accuracy: {val_accuracy:.2f}")
+
+    #Train and evaluate on all Channels
+    print("Extracting all Channel features...")
+    clf.construct_dataset(all_channels)
+    print("Training on all Channels...")
     train_accuracy, val_accuracy = clf.train_and_evaluate()
     print(f"Train Accuracy: {train_accuracy:.2f}")
     print(f"Val Accuracy: {val_accuracy:.2f}")
 
-    # Train and evaluate on spec Channels
-    print("Extracting SVD Channel features...")
-    clf.construct_dataset(spectral_channels)
-    print("Training on Spectral Entropy Channels...")
-    train_accuracy, val_accuracy = clf.train_and_evaluate()
-    end_time = time.time()
-    print(f"Train Accuracy: {train_accuracy:.2f}")
-    print(f"Val Accuracy: {val_accuracy:.2f}")
-    print(f"Time taken to train: {end_time - start_time} seconds")
-
-    # Train and evaluate on variance Channels
-    print("Extracting SVD Channel features...")
-    clf.construct_dataset(var_channels)
-    print("Training on Variance Channels...")
-    train_accuracy, val_accuracy = clf.train_and_evaluate()
-    print(f"Train Accuracy: {train_accuracy:.2f}")
-    print(f"Val Accuracy: {val_accuracy:.2f}")
+    
 
 if __name__ == "__main__":
     main()

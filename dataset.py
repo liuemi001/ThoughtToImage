@@ -23,6 +23,7 @@ class EEGDataset(Dataset):
         # Load EEG signals
         loaded = torch.load(eeg_signals_path)
         subject = 0
+        print("channels: ", channels)
         
         self.data = [trim_eeg_sample(item['eeg'], channels) for item in loaded['dataset']
                               if (item['subject'] == subject or subject == 0)]
