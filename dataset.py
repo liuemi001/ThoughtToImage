@@ -18,7 +18,7 @@ class EEGDataset(Dataset):
     """
     A dataset class for loading and transforming EEG and corresponding ImageNet data.
     """
-    def __init__(self, eeg_signals_path, imagenet_path, subject=0, time_low=20, time_high=460):
+    def __init__(self, eeg_signals_path, imagenet_path=None, subject=0, time_low=20, time_high=460):
         # Load EEG signals
         loaded = torch.load(eeg_signals_path)
         
