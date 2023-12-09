@@ -1,4 +1,7 @@
 import torch
+import mne
+import pprint
+import matplotlib.pyplot as plt
 
 eeg_14_70_path = "./datasets/eeg_14_70_std.pth" # Likely refers to freq range
 eeg_5_95_path = "./datasets/eeg_5_95_std.pth"
@@ -50,9 +53,6 @@ block_splits_by_image_path = "./datasets/block_splits_by_image_single.pth"
 # [{}, {}, {}, {}, {}, {}]
 # Each {} contains training, validation, testing
 
-
-
-import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 # ** eeg_14_70 (same can be done for eeg_5_95, eeg_55_95) ** 
@@ -69,3 +69,30 @@ print("Images sample:", eeg_14_70_data['images'][:5])  # First 5 images
 # ** block_splits_by_image_all ** 
 # block_splits_by_image_all_data = torch.load(block_splits_by_image_all_path)
 # print(block_splits_by_image_all_data['splits'][0]['train'])
+
+def plot_channels(eeg_path, channels_range=(0, 20), sfreq=100):
+    # load data
+    eeg_data = torch.load(eeg_path)
+    
+    # Extract the EEG signals from the first record
+    eeg_signals = eeg_data['dataset'][0]['eeg']
+
+    # Convert to numpy array
+    eeg_array = eeg_signals.numpy()
+
+    # Create an MNE Info structure
+    info = mne.create_info(
+        ch_names=[f"EEG {i}" for i in range(eeg_array.shape[0])],
+        sfreq=sfreq,  # Set the correct sampling frequency
+        ch_types='eeg'
+    )
+
+    # Create RawArray
+    raw = mne.io.RawArray(eeg_array, info)
+
+    # Plotting
+    fig = raw.plot(order=list(range(*channels_range)), show_scrollbars=True, show_scalebars=True)
+    fig.savefig("eeg_plot.png", dpi=600)
+
+# Example usage
+plot_channels(eeg_14_70_path)
