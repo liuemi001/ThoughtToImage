@@ -1,11 +1,11 @@
 import torch
 
-eeg_14_70_path = "../eeg_14_70_std.pth" # Likely refers to freq range
-eeg_5_95_path = "../DreamDiffusion-main/dreamdiffusion/datasets/eeg_5_95_std.pth"
-eeg_55_95_path = "../eeg_55_95_std.pth"
-eeg_signals_raw_with_mean_path = "../eeg_signals_raw_with_mean_std.pth"
-block_splits_by_image_all_path = "../DreamDiffusion-main/dreamdiffusion/datasets/block_splits_by_image_all.pth"
-block_splits_by_image_path = "../DreamDiffusion-main/dreamdiffusion/datasets/block_splits_by_image_single.pth"
+eeg_14_70_path = "./datasets/eeg_14_70_std.pth" # Likely refers to freq range
+eeg_5_95_path = "./datasets/eeg_5_95_std.pth"
+eeg_55_95_path = "./datasets/eeg_55_95_std.pth"
+eeg_signals_raw_with_mean_path = "./datasets/eeg_signals_raw_with_mean_std.pth"
+block_splits_by_image_all_path = "./datasets/block_splits_by_image_all.pth"
+block_splits_by_image_path = "./datasets/block_splits_by_image_single.pth"
 
 # ** How Everything Is Formatted **
 
