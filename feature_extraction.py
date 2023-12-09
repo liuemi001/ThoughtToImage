@@ -7,7 +7,7 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
 from pprint import pprint
 import dataset
 import pyeeg
@@ -125,6 +125,7 @@ class VisualClassifer(object):
         val_predictions = self.model.predict(self.X_val)
         train_accuracy = accuracy_score(self.y_train, train_predictions)
         val_accuracy = accuracy_score(self.y_val, val_predictions)
+        print(classification_report(self.y_val, val_predictions))
         return train_accuracy, val_accuracy
     
 
@@ -136,10 +137,37 @@ def main():
     physio_channels = [39, 47, 58, 66, 76, 84, 96, 100, 116, 117]
     all_physio_channels = [39, 47, 58, 66, 76, 84, 96, 100, 116, 117, 120, 121, 122, 123, 124, 125, 126, 127]
     all_channels = list(range(128))
+    O_channels = [120, 121, 122, 123, 124, 125]  # Occipital only
+    T_channels = [39, 47, 58, 66, 76, 84]  # temporal channels only
+    P_channels = [96, 100, 116, 117]  # parietal only
 
     # Load and split data using channel selection, pregiven splits
     print("Initializing model...")
     clf = VisualClassifer(eeg_55_95_path, block_splits_by_image_all_path)
+
+    # #Train and evaluate on temp + parietal Channels
+    # print("Extracting temp channel feats...")
+    # clf.construct_dataset(T_channels)
+    # print("Training on temp Channels...")
+    # train_accuracy, val_accuracy = clf.train_and_evaluate()
+    # print(f"Train Accuracy: {train_accuracy:.2f}")
+    # print(f"Val Accuracy: {val_accuracy:.2f}")
+
+    # Train and evaluate on occipital + parietal Channels
+    print("Extracting parietal channel feats...")
+    clf.construct_dataset(P_channels)
+    print("Training on parietal Channels...")
+    train_accuracy, val_accuracy = clf.train_and_evaluate()
+    print(f"Train Accuracy: {train_accuracy:.2f}")
+    print(f"Val Accuracy: {val_accuracy:.2f}")
+
+    # # Train and evaluate on occipital  + temporal Channels
+    # print("Extracting occipital features...")
+    # clf.construct_dataset(O_channels)
+    # print("Training on occipital Channels...")
+    # train_accuracy, val_accuracy = clf.train_and_evaluate()
+    # print(f"Train Accuracy: {train_accuracy:.2f}")
+    # print(f"Val Accuracy: {val_accuracy:.2f}")
 
     # # Train and evaluate on SVD Channels
     # print("Extracting SVD Channel features...")
@@ -169,15 +197,15 @@ def main():
     # print(f"Train Accuracy: {train_accuracy:.2f}")
     # print(f"Val Accuracy: {val_accuracy:.2f}")
 
-    # #Train and evaluate on SVD + variance Channels
-    # SVD_var = list(set(svd_channels + var_channels))
-    # SVD_var.sort()
-    # print("Extracting SVD + var Channel features...")
-    # clf.construct_dataset(SVD_var)
-    # print("Training on SVD + Variance Channels...")
-    # train_accuracy, val_accuracy = clf.train_and_evaluate()
-    # print(f"Train Accuracy: {train_accuracy:.2f}")
-    # print(f"Val Accuracy: {val_accuracy:.2f}")
+    #Train and evaluate on SVD + variance Channels
+    SVD_var = list(set(svd_channels + var_channels))
+    SVD_var.sort()
+    print("Extracting SVD + var Channel features...")
+    clf.construct_dataset(SVD_var)
+    print("Training on SVD + Variance Channels...")
+    train_accuracy, val_accuracy = clf.train_and_evaluate()
+    print(f"Train Accuracy: {train_accuracy:.2f}")
+    print(f"Val Accuracy: {val_accuracy:.2f}")
 
     # # Train and evaluate on temporal + parietal Channels
     # print("Extracting physio Channel features (temporal and parietal)...")
@@ -205,13 +233,13 @@ def main():
     # print(f"Train Accuracy: {train_accuracy:.2f}")
     # print(f"Val Accuracy: {val_accuracy:.2f}")
 
-    #Train and evaluate on all Channels
-    print("Extracting all Channel features...")
-    clf.construct_dataset(all_channels)
-    print("Training on all Channels...")
-    train_accuracy, val_accuracy = clf.train_and_evaluate()
-    print(f"Train Accuracy: {train_accuracy:.2f}")
-    print(f"Val Accuracy: {val_accuracy:.2f}")
+    # #Train and evaluate on all Channels
+    # print("Extracting all Channel features...")
+    # clf.construct_dataset(all_channels)
+    # print("Training on all Channels...")
+    # train_accuracy, val_accuracy = clf.train_and_evaluate()
+    # print(f"Train Accuracy: {train_accuracy:.2f}")
+    # print(f"Val Accuracy: {val_accuracy:.2f}")
 
     
 
