@@ -7,7 +7,7 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from pprint import pprint
 import dataset
 import pyeeg
@@ -125,6 +125,26 @@ class VisualClassifer(object):
         val_predictions = self.model.predict(self.X_val)
         train_accuracy = accuracy_score(self.y_train, train_predictions)
         val_accuracy = accuracy_score(self.y_val, val_predictions)
+        # TO DO: CONFUSION MATRIX CODE HERE
+        class_of_interest = 36
+
+        # Modify the labels to create a binary problem: class 36 vs. all other classes
+        y_val_binary = [1 if label == class_of_interest else 0 for label in self.y_val]
+        print(sum(y_val_binary))
+        val_predictions_binary = [1 if label == class_of_interest else 0 for label in val_predictions]
+
+        # Calculate and print the 2x2 confusion matrix
+        cm = confusion_matrix(y_val_binary, val_predictions_binary)
+        print("Confusion Matrix for class 36: ")
+        print(cm)
+        tn, fp, fn, tp = cm.ravel()
+        print("Raw values:")
+        print(tn, fp, fn, tp)
+        print(f"True Negative Rate: {tn / (tn + fp):.2f}")
+        print(f"False Positive Rate: {fp / (tn + fp):.2f}")
+        print(f"False Negative Rate: {fn / (fn + tp):.2f}")
+        print(f"True Positive Rate: {tp / (fn + tp):.2f}")
+
         print(classification_report(self.y_val, val_predictions))
         return train_accuracy, val_accuracy
     
@@ -154,12 +174,12 @@ def main():
     # print(f"Val Accuracy: {val_accuracy:.2f}")
 
     # Train and evaluate on occipital + parietal Channels
-    print("Extracting parietal channel feats...")
-    clf.construct_dataset(P_channels)
-    print("Training on parietal Channels...")
-    train_accuracy, val_accuracy = clf.train_and_evaluate()
-    print(f"Train Accuracy: {train_accuracy:.2f}")
-    print(f"Val Accuracy: {val_accuracy:.2f}")
+    # print("Extracting parietal channel feats...")
+    # clf.construct_dataset(P_channels)
+    # print("Training on parietal Channels...")
+    # train_accuracy, val_accuracy = clf.train_and_evaluate()
+    # print(f"Train Accuracy: {train_accuracy:.2f}")
+    # print(f"Val Accuracy: {val_accuracy:.2f}")
 
     # # Train and evaluate on occipital  + temporal Channels
     # print("Extracting occipital features...")
